@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Schibsted_Grotesk } from "next/font/google";
+import { BackToTop } from "@/components/site/back-to-top";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
@@ -47,7 +48,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="flex min-h-full flex-col">
-        <TooltipProvider>{children}</TooltipProvider>
+        <TooltipProvider>
+          {children}
+          <BackToTop />
+        </TooltipProvider>
       </body>
     </html>
   );

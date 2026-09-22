@@ -41,6 +41,8 @@ export type Grade = "A" | "B" | "C" | "D" | "F";
 
 export type Report = {
   target: string;
+  /** The site's tab icon, found in the homepage HTML, or its /favicon.ico. */
+  icon?: string;
   startedAt: string;
   finishedAt: string;
   grade: Grade;

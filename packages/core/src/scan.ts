@@ -3,9 +3,11 @@ import { dnsCheck } from "./checks/dns.ts";
 import { headersCheck } from "./checks/headers.ts";
 import { tlsCheck } from "./checks/tls.ts";
 import type { Check } from "./checks/types.ts";
-import { safeFetch } from "./http.ts";
+import { readLimited, safeFetch } from "./http.ts";
+import { findIcon } from "./icon.ts";
 import { scoreFindings } from "./scoring.ts";
 import { normalizeTarget } from "./target.ts";
+import type { Response } from "undici";
 import type { CheckResult, Report, ScanEvent, ScanOptions } from "./types.ts";
 
 export const liveChecks: Check[] = [tlsCheck, headersCheck, cookiesCheck, dnsCheck];
@@ -19,8 +21,9 @@ export async function scan(options: ScanOptions, onEvent: (e: ScanEvent) => void
   const signal = options.signal;
 
   const home = await safeFetch(url, { signal });
-  // Only headers are needed. Drop the body so the socket is freed.
-  await home.response.body?.cancel();
+  // The checks only need headers. The start of the HTML is read for the tab icon, and the
+  // rest is dropped so the socket is freed.
+  const icon = await readIcon(home.response, home.finalUrl);
 
   const checks: CheckResult[] = [];
   for (const check of liveChecks) {
@@ -52,6 +55,7 @@ export async function scan(options: ScanOptions, onEvent: (e: ScanEvent) => void
 
   return {
     target: url.origin,
+    icon,
     startedAt,
     finishedAt: new Date().toISOString(),
     grade,
@@ -59,4 +63,18 @@ export async function scan(options: ScanOptions, onEvent: (e: ScanEvent) => void
     checks,
     findings,
   };
+}
+
+async function readIcon(response: Response, pageUrl: URL): Promise<string> {
+  const fallback = new URL("/favicon.ico", pageUrl).href;
+  if (!response.headers.get("content-type")?.includes("html")) {
+    await response.body?.cancel();
+    return fallback;
+  }
+  try {
+    // Icon links live in <head>, which is almost always inside the first 128 KB.
+    return findIcon(await readLimited(response, 128 * 1024), pageUrl);
+  } catch {
+    return fallback;
+  }
 }

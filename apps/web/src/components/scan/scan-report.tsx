@@ -5,18 +5,27 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CheckIcon, CircleDashedIcon, LoaderCircleIcon, MinusIcon, RotateCwIcon } from "lucide-react";
 import { ScanForm } from "@/components/scan/scan-form";
+import { SiteIcon } from "@/components/scan/site-icon";
 import { CodeBlock } from "@/components/site/code-block";
-import { GradeTile } from "@/components/site/grade";
 import { SeverityLabel } from "@/components/site/severity";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ApiError, createScan, getScan, scanEventsUrl, type Finding, type Scan, type Severity } from "@/lib/api";
+import { ApiError, createScan, getScan, scanEventsUrl, type Finding, type Grade, type Scan, type Severity } from "@/lib/api";
 import { checks } from "@/lib/checks";
+import { cn } from "@/lib/utils";
 
 // The checks the website runs today, in the order the engine runs them.
 const LIVE_CHECK_IDS = ["TLS001", "HDR001", "CKE001", "DNS001"];
 const checkName = (id: string) => checks.find((c) => c.id === id)?.name ?? id;
+
+const GRADE_TEXT: Record<Grade, string> = {
+  A: "text-pass",
+  B: "text-pass",
+  C: "text-sev-medium",
+  D: "text-sev-high",
+  F: "text-sev-critical",
+};
 
 const SEVERITY_ORDER: Severity[] = ["critical", "high", "medium", "low", "info"];
 
@@ -215,9 +224,12 @@ function Results({ scan, report }: { scan: Scan; report: NonNullable<Scan["repor
       {rescanError ? <p className="text-sm text-destructive">{rescanError}</p> : null}
 
       <section className="grid grid-cols-1 gap-6 rounded-xl border bg-surface-low p-5 sm:grid-cols-[auto_1fr] sm:items-center">
-        <GradeTile grade={report.grade} className="size-24 text-6xl" />
+        <SiteIcon src={report.icon} className="size-24" />
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
+            Grade{" "}
+            <span className={cn("font-heading text-2xl font-semibold", GRADE_TEXT[report.grade])}>{report.grade}</span>
+            <span className="mx-2">·</span>
             <span className="font-heading text-2xl font-semibold text-foreground">{report.score}</span> out of 100.
             Scanned {new Date(report.finishedAt).toLocaleString()}.
           </p>

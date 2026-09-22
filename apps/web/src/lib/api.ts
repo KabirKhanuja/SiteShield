@@ -28,6 +28,7 @@ export type CheckResult = { checkId: string; ran: boolean; skippedReason?: strin
 
 export type Report = {
   target: string;
+  icon?: string;
   startedAt: string;
   finishedAt: string;
   grade: Grade;
