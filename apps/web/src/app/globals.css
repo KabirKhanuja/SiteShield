@@ -1,0 +1,168 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Design decisions:
+  Direction: an inspection report, in the visual language of developer tooling (GitHub's Primer
+  is the reference). The people reading a security report live in their code host all day, so
+  the report should feel like part of that world, not like a marketing page.
+  Primary: one working blue, used for actions and for "confirmed". Nothing else competes with it.
+  Neutrals: cool greys with visible hairline borders, which carry most of the structure.
+  Surfaces step up in tone (surface, low, mid, high) instead of using drop shadows, as in Material 3.
+  Shape: 4px small marks, 6px controls, 12px cards.
+*/
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-code);
+  --font-heading: var(--font-display);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Material 3 roles */
+  --color-primary-text: var(--primary-text);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-surface: var(--surface);
+  --color-surface-low: var(--surface-low);
+  --color-surface-mid: var(--surface-mid);
+  --color-surface-high: var(--surface-high);
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  /* Finding severities and states */
+  --color-sev-critical: var(--sev-critical);
+  --color-sev-high: var(--sev-high);
+  --color-sev-medium: var(--sev-medium);
+  --color-sev-low: var(--sev-low);
+  --color-pass: var(--pass);
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-xl: 12px;
+  --radius-2xl: 12px;
+  --radius-3xl: 12px;
+  --radius-4xl: 12px;
+}
+
+:root {
+  --surface: #ffffff;
+  --surface-low: #f6f8fa;
+  --surface-mid: #eff2f5;
+  --surface-high: #e6eaef;
+  --inverse-surface: #25292e;
+  --inverse-on-surface: #f6f8fa;
+  --outline: #818b98;
+  --outline-variant: #d1d9e0;
+
+  --primary: #0969da;
+  --primary-text: #0969da;
+  --primary-foreground: #ffffff;
+  --primary-container: #ddf4ff;
+  --on-primary-container: #0a3069;
+
+  --background: var(--surface);
+  --foreground: #1f2328;
+  --card: var(--surface-low);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --secondary: var(--surface-low);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--surface-mid);
+  --muted-foreground: #59636e;
+  --accent: var(--surface-mid);
+  --accent-foreground: var(--foreground);
+  --destructive: #cf222e;
+  --border: var(--outline-variant);
+  --input: var(--outline-variant);
+  --ring: var(--primary);
+
+  --sev-critical: #cf222e;
+  --sev-high: #bc4c00;
+  --sev-medium: #9a6700;
+  --sev-low: #59636e;
+  --pass: #1a7f37;
+
+  --radius: 12px;
+}
+
+.dark {
+  --surface: #0d1117;
+  --surface-low: #151b23;
+  --surface-mid: #1b222c;
+  --surface-high: #242c37;
+  --inverse-surface: #f0f6fc;
+  --inverse-on-surface: #1f2328;
+  --outline: #656c76;
+  --outline-variant: #3d444d;
+
+  /* Filled buttons keep a deeper blue so white text stays readable; links use the lighter one. */
+  --primary: #1f6feb;
+  --primary-text: #4493f8;
+  --primary-foreground: #ffffff;
+  --primary-container: #0c2d6b;
+  --on-primary-container: #a5d6ff;
+
+  --foreground: #f0f6fc;
+  --popover: var(--surface-high);
+  --muted-foreground: #9198a1;
+  --destructive: #f85149;
+
+  --sev-critical: #f85149;
+  --sev-high: #db6d28;
+  --sev-medium: #d29922;
+  --sev-low: #9198a1;
+  --pass: #3fb950;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    scroll-padding-top: 5rem;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  ::selection {
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
