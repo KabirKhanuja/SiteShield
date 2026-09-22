@@ -1,7 +1,7 @@
 import { CheckCheckIcon, FileCodeIcon, GlobeIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type Severity = "critical" | "high" | "medium" | "low";
+export type Severity = "critical" | "high" | "medium" | "low" | "info";
 export type FindingStatus = "confirmed" | "code" | "live";
 
 const severityClass: Record<Severity, string> = {
@@ -9,6 +9,7 @@ const severityClass: Record<Severity, string> = {
   high: "bg-sev-high",
   medium: "bg-sev-medium",
   low: "bg-sev-low",
+  info: "border border-outline bg-transparent",
 };
 
 export function SeverityLabel({ severity, className }: { severity: Severity; className?: string }) {

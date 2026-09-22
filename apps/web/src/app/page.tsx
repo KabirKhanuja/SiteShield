@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRightIcon, LockKeyholeIcon } from "lucide-react";
+import { ScanForm } from "@/components/scan/scan-form";
 import { CodeBlock } from "@/components/site/code-block";
 import { Command } from "@/components/site/command";
 import { GradeTile, type Grade } from "@/components/site/grade";
@@ -60,21 +61,19 @@ function Hero() {
             same problem, the finding is marked confirmed. Every finding comes with the fix for your
             stack, and a second scan tells you whether the fix actually worked.
           </p>
-          <div className="max-w-xl space-y-3">
+          <ScanForm className="max-w-xl" />
+          <div className="max-w-xl space-y-2">
+            <p className="text-sm text-muted-foreground">Or from a terminal, once the npm package is published:</p>
             <Command value={SCAN_COMMAND} />
-            <p className="text-sm text-muted-foreground">
-              Needs Node 20 or newer. The npm package is not published yet, so treat this as the
-              interface we are building toward.
-            </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button asChild size="lg" className="px-4">
+            <Button asChild size="lg" variant="outline" className="px-4">
               <Link href="/docs">
                 Read the docs
                 <ArrowRightIcon data-icon="inline-end" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="px-4">
+            <Button asChild size="lg" variant="ghost" className="px-4">
               <Link href="#checks">See what it checks</Link>
             </Button>
           </div>

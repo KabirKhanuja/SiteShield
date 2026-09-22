@@ -4,6 +4,7 @@ import { ThemeToggle } from "@/components/site/theme-toggle";
 import { Button } from "@/components/ui/button";
 
 const links = [
+  { href: "/scan", label: "Scan" },
   { href: "/#checks", label: "Checks" },
   { href: "/#fixes", label: "Fixes" },
   { href: "/docs", label: "Docs" },
@@ -22,6 +23,9 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-1">
+          <Button variant="ghost" asChild className="sm:hidden">
+            <Link href="/scan">Scan</Link>
+          </Button>
           <Button variant="ghost" asChild className="sm:hidden">
             <Link href="/docs">Docs</Link>
           </Button>
