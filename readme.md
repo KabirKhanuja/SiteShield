@@ -1,3 +1,5 @@
+![architecture](image.png)
+
 1. A website health check. Is your HTTPS set up properly? Is the certificate valid? Does your site send the security settings browsers expect?
 2. An email spoofing check. Can someone send fake emails pretending to be your domain?
 3. An "is anything leaking" check. Are private files like .env or .git, or debug pages, publicly reachable? Are secret keys visible in your site's JavaScript?

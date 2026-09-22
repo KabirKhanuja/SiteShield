@@ -1,0 +1,26 @@
+{
+  "name": "@siteshield/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SiteShield scan engine: checks, matching, grading and ownership verification.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "undici": "^7.29.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.18.1"
+  },
+  "license": "MIT"
+}

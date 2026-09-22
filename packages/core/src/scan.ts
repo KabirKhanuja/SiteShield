@@ -1,0 +1,62 @@
+import { cookiesCheck } from "./checks/cookies.ts";
+import { dnsCheck } from "./checks/dns.ts";
+import { headersCheck } from "./checks/headers.ts";
+import { tlsCheck } from "./checks/tls.ts";
+import type { Check } from "./checks/types.ts";
+import { safeFetch } from "./http.ts";
+import { scoreFindings } from "./scoring.ts";
+import { normalizeTarget } from "./target.ts";
+import type { CheckResult, Report, ScanEvent, ScanOptions } from "./types.ts";
+
+export const liveChecks: Check[] = [tlsCheck, headersCheck, cookiesCheck, dnsCheck];
+
+/** Listed so reports show them as skipped instead of silently leaving them out. */
+const plannedActiveChecks = ["EXP001", "RTL001", "INJ001"];
+
+export async function scan(options: ScanOptions, onEvent: (e: ScanEvent) => void = () => {}): Promise<Report> {
+  const startedAt = new Date().toISOString();
+  const url = normalizeTarget(options.url);
+  const signal = options.signal;
+
+  const home = await safeFetch(url, { signal });
+  // Only headers are needed. Drop the body so the socket is freed.
+  await home.response.body?.cancel();
+
+  const checks: CheckResult[] = [];
+  for (const check of liveChecks) {
+    signal?.throwIfAborted();
+    onEvent({ type: "check:start", checkId: check.id });
+    try {
+      const findings = await check.run({ url, home, signal });
+      checks.push({ checkId: check.id, ran: true, findings });
+      onEvent({ type: "check:done", checkId: check.id, findings: findings.length, ran: true });
+    } catch (err) {
+      if (signal?.aborted) throw err;
+      // One broken check should not sink the whole scan. Record why it did not run.
+      checks.push({ checkId: check.id, ran: false, skippedReason: (err as Error).message, findings: [] });
+      onEvent({ type: "check:done", checkId: check.id, findings: 0, ran: false });
+    }
+  }
+
+  for (const id of plannedActiveChecks) {
+    checks.push({
+      checkId: id,
+      ran: false,
+      skippedReason: options.active ? "Not implemented yet." : "Needs ownership verification.",
+      findings: [],
+    });
+  }
+
+  const findings = checks.flatMap((c) => c.findings);
+  const { score, grade } = scoreFindings(findings);
+
+  return {
+    target: url.origin,
+    startedAt,
+    finishedAt: new Date().toISOString(),
+    grade,
+    score,
+    checks,
+    findings,
+  };
+}

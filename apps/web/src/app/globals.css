@@ -9,8 +9,9 @@
   Direction: an inspection report, in the visual language of developer tooling (GitHub's Primer
   is the reference). The people reading a security report live in their code host all day, so
   the report should feel like part of that world, not like a marketing page.
-  Primary: one working blue, used for actions and for "confirmed". Nothing else competes with it.
-  Neutrals: cool greys with visible hairline borders, which carry most of the structure.
+  Primary: one working red, used for actions and for "confirmed". Nothing else competes with it.
+  Neutrals: true greys with no blue or warm cast, so the red is the only color on the page.
+  Hairline borders carry most of the structure.
   Surfaces step up in tone (surface, low, mid, high) instead of using drop shadows, as in Material 3.
   Shape: 4px small marks, 6px controls, 12px cards.
 */
@@ -71,22 +72,22 @@
 
 :root {
   --surface: #ffffff;
-  --surface-low: #f6f8fa;
-  --surface-mid: #eff2f5;
-  --surface-high: #e6eaef;
-  --inverse-surface: #25292e;
-  --inverse-on-surface: #f6f8fa;
-  --outline: #818b98;
-  --outline-variant: #d1d9e0;
+  --surface-low: #fafafa;
+  --surface-mid: #f4f4f5;
+  --surface-high: #e8e8ea;
+  --inverse-surface: #232326;
+  --inverse-on-surface: #fafafa;
+  --outline: #85858c;
+  --outline-variant: #dedee2;
 
-  --primary: #0969da;
-  --primary-text: #0969da;
+  --primary: #c8102e;
+  --primary-text: #b50e28;
   --primary-foreground: #ffffff;
-  --primary-container: #ddf4ff;
-  --on-primary-container: #0a3069;
+  --primary-container: #fdecee;
+  --on-primary-container: #7a0a1b;
 
   --background: var(--surface);
-  --foreground: #1f2328;
+  --foreground: #18181b;
   --card: var(--surface-low);
   --card-foreground: var(--foreground);
   --popover: var(--surface);
@@ -94,7 +95,7 @@
   --secondary: var(--surface-low);
   --secondary-foreground: var(--foreground);
   --muted: var(--surface-mid);
-  --muted-foreground: #59636e;
+  --muted-foreground: #5c5c63;
   --accent: var(--surface-mid);
   --accent-foreground: var(--foreground);
   --destructive: #cf222e;
@@ -105,38 +106,38 @@
   --sev-critical: #cf222e;
   --sev-high: #bc4c00;
   --sev-medium: #9a6700;
-  --sev-low: #59636e;
+  --sev-low: #5c5c63;
   --pass: #1a7f37;
 
   --radius: 12px;
 }
 
 .dark {
-  --surface: #0d1117;
-  --surface-low: #151b23;
-  --surface-mid: #1b222c;
-  --surface-high: #242c37;
-  --inverse-surface: #f0f6fc;
-  --inverse-on-surface: #1f2328;
-  --outline: #656c76;
-  --outline-variant: #3d444d;
+  --surface: #0c0c0d;
+  --surface-low: #141416;
+  --surface-mid: #1b1b1e;
+  --surface-high: #25252a;
+  --inverse-surface: #f4f4f5;
+  --inverse-on-surface: #18181b;
+  --outline: #6b6b72;
+  --outline-variant: #34343a;
 
-  /* Filled buttons keep a deeper blue so white text stays readable; links use the lighter one. */
-  --primary: #1f6feb;
-  --primary-text: #4493f8;
+  /* Filled buttons keep a deeper red so white text stays readable; links use the lighter one. */
+  --primary: #d42a3c;
+  --primary-text: #ff6b76;
   --primary-foreground: #ffffff;
-  --primary-container: #0c2d6b;
-  --on-primary-container: #a5d6ff;
+  --primary-container: #3b0d13;
+  --on-primary-container: #ffc2c7;
 
-  --foreground: #f0f6fc;
+  --foreground: #f4f4f5;
   --popover: var(--surface-high);
-  --muted-foreground: #9198a1;
+  --muted-foreground: #a1a1aa;
   --destructive: #f85149;
 
   --sev-critical: #f85149;
   --sev-high: #db6d28;
   --sev-medium: #d29922;
-  --sev-low: #9198a1;
+  --sev-low: #a1a1aa;
   --pass: #3fb950;
 }
 

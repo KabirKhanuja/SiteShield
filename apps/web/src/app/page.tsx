@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { ArrowRightIcon, CheckCheckIcon, LockKeyholeIcon } from "lucide-react";
+import { ArrowRightIcon, LockKeyholeIcon } from "lucide-react";
 import { CodeBlock } from "@/components/site/code-block";
 import { Command } from "@/components/site/command";
 import { GradeTile, type Grade } from "@/components/site/grade";
 import { ReportPreview } from "@/components/site/report-preview";
+import { SeverityLabel, StatusLabel } from "@/components/site/severity";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { Button } from "@/components/ui/button";
@@ -176,12 +177,16 @@ function Confirmation() {
           </div>
         </div>
 
-        <div className="flex gap-3 rounded-lg border border-primary/40 bg-primary-container/50 p-4">
-          <CheckCheckIcon className="mt-0.5 size-4 shrink-0 text-primary-text" aria-hidden />
-          <p className="text-sm text-pretty">
-            <strong className="font-semibold">Confirmed, high severity.</strong> The config reflects any origin and the live API proves it. A page on any other domain can
-            read <span className="font-mono">/api/me</span> as your logged in user. The fix goes on
-            line 12.
+        {/* The verdict, marked the same way as a row in the report rather than as a callout box. */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:gap-6">
+          <div className="flex shrink-0 items-start gap-4">
+            <StatusLabel status="confirmed" />
+            <SeverityLabel severity="high" className="pt-0.5" />
+          </div>
+          <p className="text-sm text-pretty text-muted-foreground">
+            The config reflects any origin and the live API proves it. A page on any other domain can
+            read <span className="font-mono text-foreground">/api/me</span> as your logged in user.
+            The fix goes on line 12.
           </p>
         </div>
       </Container>
