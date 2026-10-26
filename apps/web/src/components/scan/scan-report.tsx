@@ -15,8 +15,8 @@ import { ApiError, createScan, getScan, scanEventsUrl, type Finding, type Grade,
 import { checks } from "@/lib/checks";
 import { cn } from "@/lib/utils";
 
-// The checks the website runs today, in the order the engine runs them.
-const LIVE_CHECK_IDS = ["TLS001", "HDR001", "CKE001", "DNS001"];
+// The passive live checks the website runs today, in the order the engine runs them.
+const LIVE_CHECK_IDS = ["TLS001", "HDR001", "CKE001", "DNS001", "COR001", "BND001", "VER001", "DSC001"];
 const checkName = (id: string) => checks.find((c) => c.id === id)?.name ?? id;
 
 const GRADE_TEXT: Record<Grade, string> = {
@@ -293,11 +293,26 @@ function FindingItem({ finding: f, value }: { finding: Finding; value: string })
       <AccordionTrigger className="gap-3 py-3.5 hover:no-underline">
         <span className="grid flex-1 grid-cols-1 gap-1 sm:grid-cols-[5.5rem_1fr_auto] sm:items-center sm:gap-3">
           <SeverityLabel severity={f.severity} />
-          <span className="text-sm font-medium">{f.title}</span>
+          <span className="flex items-center gap-2 text-sm font-medium">
+            {f.title}
+            {f.status === "confirmed" ? (
+              <span className="rounded-xs bg-sev-critical/15 px-1.5 py-0.5 text-[0.65rem] font-semibold tracking-wide text-sev-critical uppercase">
+                Confirmed
+              </span>
+            ) : null}
+          </span>
           <span className="font-mono text-xs font-normal text-muted-foreground">{f.checkId}</span>
         </span>
       </AccordionTrigger>
       <AccordionContent className="space-y-4 pb-5 sm:pl-[6.25rem]">
+        {f.cvss || f.owasp || f.cwe || f.location ? (
+          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            {f.cvss ? <span className="rounded-xs bg-surface-mid px-1.5 py-0.5 font-mono">CVSS {f.cvss}</span> : null}
+            {f.cwe ? <span className="rounded-xs bg-surface-mid px-1.5 py-0.5 font-mono">{f.cwe}</span> : null}
+            {f.owasp ? <span className="rounded-xs bg-surface-mid px-1.5 py-0.5">{f.owasp}</span> : null}
+            {f.location ? <span className="font-mono">{f.location}</span> : null}
+          </div>
+        ) : null}
         <p className="text-pretty text-muted-foreground">{f.detail}</p>
         {f.evidence ? (
           <div className="space-y-1.5">

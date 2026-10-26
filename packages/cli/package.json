@@ -1,0 +1,27 @@
+{
+  "name": "siteshield",
+  "version": "0.1.0",
+  "description": "Audit a live website and the source code behind it in one pass: security headers, TLS, DNS, secrets, vulnerable dependencies and insecure patterns, with copy-paste fixes and a unified A-F grade.",
+  "type": "module",
+  "bin": {
+    "siteshield": "src/cli.ts"
+  },
+  "scripts": {
+    "siteshield": "node --import tsx src/cli.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --disable-warning=ExperimentalWarning --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@siteshield/core": "*",
+    "tsx": "^4.23.15"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.9.3"
+  },
+  "files": ["src"],
+  "engines": {
+    "node": ">=20.18.1"
+  },
+  "license": "MIT"
+}

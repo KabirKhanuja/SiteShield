@@ -14,3 +14,34 @@
 12. Fix verification. Re-scan after fixing and see before vs. after, what's fixed and what's still broken.
 13. Safety built in. It won't run any attack-style test on a site until you prove you own it.
 14. Three ways to use it. A website dashboard, a command-line tool (npx siteshield scan), or an automatic check in GitHub that blocks bad code from being merged.
+
+## Quick start
+
+```bash
+npm install            # from the repo root
+
+# scan the live site and the code behind it
+npm run siteshield -- scan https://example.com --src .
+
+# scan only your code (no network requests to a site)
+npm run siteshield -- scan --src .
+```
+
+The scan engine lives in [`packages/core`](packages/core), the command-line tool in
+[`packages/cli`](packages/cli) (see its [README](packages/cli/README.md) for every flag and
+output format), the dashboard API in [`apps/api`](apps/api), and the website in
+[`apps/web`](apps/web). The CI gate lives in
+[`.github/workflows/security.yml`](.github/workflows/security.yml).
+
+Run the whole workspace's checks with `npm run typecheck` and `npm test`.
+
+## What runs where today
+
+- **Live site (passive):** TLS/certificate/HSTS, security headers, cookie flags, SPF/DKIM/DMARC,
+  CORS policy, secrets in shipped JavaScript, outdated libraries (via OSV.dev), and `security.txt`.
+  These only read what any visitor's browser already receives.
+- **Source code:** hardcoded secrets, secrets in public env vars, vulnerable dependencies,
+  routes with no auth check, auth routes with no limiter, permissive CORS, injection sinks,
+  unsafe HTML sinks, and unsafe settings.
+- **Active checks** (exposed files, rate-limit test, injection probe) send test traffic, so they
+  stay gated behind ownership verification and are shown as skipped until then.

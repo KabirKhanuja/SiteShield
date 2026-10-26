@@ -6,6 +6,8 @@ export type CheckContext = {
   url: URL;
   /** The homepage response, fetched once and shared by the checks that only need headers. */
   home: { response: Response; finalUrl: URL };
+  /** The start of the homepage HTML (bounded), for checks that read <script> tags etc. */
+  html?: string;
   signal?: AbortSignal;
 };
 

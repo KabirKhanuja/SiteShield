@@ -46,7 +46,7 @@ export type SafeResponse = {
 /** fetch for user supplied targets: guarded DNS, manual redirects, each hop re-checked. */
 export async function safeFetch(
   input: URL,
-  init: { method?: "GET" | "HEAD"; signal?: AbortSignal } = {},
+  init: { method?: "GET" | "HEAD"; signal?: AbortSignal; headers?: Record<string, string> } = {},
 ): Promise<SafeResponse> {
   const signal = init.signal
     ? AbortSignal.any([init.signal, AbortSignal.timeout(TIMEOUT_MS)])
@@ -62,7 +62,7 @@ export async function safeFetch(
       redirect: "manual",
       dispatcher: agent,
       signal,
-      headers: { "user-agent": USER_AGENT, accept: "text/html,*/*;q=0.8" },
+      headers: { "user-agent": USER_AGENT, accept: "text/html,*/*;q=0.8", ...init.headers },
     });
 
     const location = response.headers.get("location");

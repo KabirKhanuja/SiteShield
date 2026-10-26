@@ -9,8 +9,9 @@
     "dev:web": "npm run dev -w @siteshield/web",
     "dev:api": "npm run dev -w @siteshield/api",
     "build:web": "npm run build -w @siteshield/web",
-    "typecheck": "npm run typecheck -w @siteshield/core -w @siteshield/api",
-    "test": "npm test -w @siteshield/core -w @siteshield/api"
+    "siteshield": "npm run siteshield -w siteshield --",
+    "typecheck": "npm run typecheck -w @siteshield/core -w @siteshield/api -w siteshield",
+    "test": "npm test -w @siteshield/core -w @siteshield/api -w siteshield"
   },
   "engines": {
     "node": ">=20"

@@ -1,0 +1,43 @@
+name: security
+
+# Scanning only the source code needs no network access to a live site and no ownership
+# check, so it is safe to run on every push and pull request. This is the CI gate: it blocks
+# a pull request that introduces a high or critical finding.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  siteshield:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # so the SARIF upload can post findings on the PR
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      # Full report as SARIF, uploaded so findings show inline in the Security tab and on the PR.
+      - name: Scan source
+        run: node --import tsx packages/cli/src/cli.ts scan --src . --format sarif > siteshield.sarif
+
+      - name: Upload results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: siteshield.sarif
+
+      # The gate: exit code 2 (anything high or critical) fails the job and blocks the merge.
+      # On SiteShield's own repo this is left non-blocking, because the scan intentionally
+      # flags its own code (for example the rejectUnauthorized used in the TLS check to inspect
+      # bad certificates). In a project that consumes SiteShield, drop continue-on-error so a
+      # high or critical finding actually blocks the pull request.
+      - name: Fail on high or critical
+        continue-on-error: true
+        run: node --import tsx packages/cli/src/cli.ts scan --src . --fail-on high

@@ -13,6 +13,8 @@ export type Remediation = {
   code?: string;
 };
 
+export type SourceLocation = { file: string; line: number; column?: number; snippet?: string };
+
 export type Finding = {
   checkId: string;
   layer: "live" | "source";
@@ -21,6 +23,11 @@ export type Finding = {
   title: string;
   detail: string;
   evidence?: string;
+  location?: string;
+  source?: SourceLocation;
+  owasp?: string;
+  cwe?: string;
+  cvss?: number;
   remediation: Remediation[];
 };
 
@@ -29,6 +36,9 @@ export type CheckResult = { checkId: string; ran: boolean; skippedReason?: strin
 export type Report = {
   target: string;
   icon?: string;
+  url?: string;
+  src?: string;
+  stacks?: ("nextjs" | "express" | "nginx" | "vercel")[];
   startedAt: string;
   finishedAt: string;
   grade: Grade;

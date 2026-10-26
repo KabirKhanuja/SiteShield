@@ -69,6 +69,14 @@ export const checks: Check[] = [
     pairsWith: ["DEP001"],
   },
   {
+    id: "DSC001",
+    layer: "live",
+    name: "Responsible disclosure",
+    question:
+      "Does the site publish a /.well-known/security.txt telling researchers how to report a vulnerability (RFC 9116)?",
+    mode: "passive",
+  },
+  {
     id: "EXP001",
     layer: "live",
     name: "Exposed files",

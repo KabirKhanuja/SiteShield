@@ -11,9 +11,10 @@ import { ScanQueue } from "../src/jobs.ts";
 
 // A fake engine, so these tests never touch the network.
 async function fakeScan(options: ScanOptions): Promise<Report> {
-  if (options.url.includes("broken")) throw new Error("boom");
+  const url = options.url ?? "";
+  if (url.includes("broken")) throw new Error("boom");
   const now = new Date().toISOString();
-  return { target: options.url, startedAt: now, finishedAt: now, grade: "B", score: 80, checks: [], findings: [] };
+  return { target: url, startedAt: now, finishedAt: now, grade: "B", score: 80, checks: [], findings: [] };
 }
 
 const db = openDatabase(":memory:");
