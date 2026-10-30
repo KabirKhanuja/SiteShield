@@ -267,7 +267,7 @@ function Results({ scan, report }: { scan: Scan; report: NonNullable<Scan["repor
           <p className="max-w-2xl text-sm text-pretty text-muted-foreground">
             The website runs the passive live checks, the ones that only read what any visitor can see.
             Checks that send test traffic wait for ownership verification, and the source code checks
-            run from the CLI against your repository.
+            run on the Scan code page or from the CLI against your repository.
           </p>
           <ul className="max-w-2xl divide-y rounded-lg border text-sm">
             {skipped.map((c) => (

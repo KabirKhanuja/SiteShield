@@ -70,6 +70,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
+export type UploadedFile = { path: string; content: string };
+
+export function scanSource(files: UploadedFile[], offline = false) {
+  return request<{ report: Report; scanned: number }>("/api/source-scans", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ files, offline }),
+  });
+}
+
 export function createScan(url: string) {
   return request<{ id: string; target: string }>("/api/scans", {
     method: "POST",

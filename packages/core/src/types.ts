@@ -1,3 +1,5 @@
+import type { SourceFile } from "./source/walk.ts";
+
 export type Severity = "critical" | "high" | "medium" | "low" | "info";
 export type Layer = "live" | "source";
 
@@ -94,6 +96,8 @@ export type ScanOptions = {
   url?: string;
   /** Folder to read source code from. Leave out to scan only the live site. */
   src?: string;
+  /** Pre-read source files (for example uploaded from a browser), used instead of reading `src`. */
+  srcFiles?: SourceFile[];
   /** Force the stack(s) used for remediation. Detected from the source otherwise. */
   stack?: Stack[];
   /** Run checks that send test traffic. Callers must verify ownership first. */

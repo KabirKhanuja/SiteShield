@@ -4,9 +4,9 @@ import { ThemeToggle } from "@/components/site/theme-toggle";
 import { Button } from "@/components/ui/button";
 
 const links = [
-  { href: "/scan", label: "Scan" },
-  { href: "/#checks", label: "Checks" },
-  { href: "/#fixes", label: "Fixes" },
+  { href: "/scan", label: "Scan a site" },
+  { href: "/scan/code", label: "Scan code" },
+  { href: "/install", label: "Run locally" },
   { href: "/docs", label: "Docs" },
 ];
 

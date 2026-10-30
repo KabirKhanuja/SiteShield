@@ -69,14 +69,17 @@ export const usage: Snippet[] = [
   {
     label: "CLI",
     file: "terminal",
-    code: `# live site and source code together
-npx siteshield scan https://yoursite.com --src .
+    code: `# install once, then the command is just "siteshield"
+npm install -g @kabirkhanuja/siteshield
+
+# live site and source code together
+siteshield scan https://yoursite.com --src .
 
 # only the code, no network requests
-npx siteshield scan --src ./apps/api
+siteshield scan --src ./apps/api
 
 # JSON for scripts, SARIF for GitHub code scanning
-npx siteshield scan https://yoursite.com --src . --format sarif > results.sarif`,
+siteshield scan https://yoursite.com --src . --format sarif > results.sarif`,
   },
   {
     label: "Config file",
@@ -92,7 +95,7 @@ npx siteshield scan https://yoursite.com --src . --format sarif > results.sarif`
   {
     label: "Library",
     file: "audit.ts",
-    code: `import { scan } from "siteshield";
+    code: `import { scan } from "@kabirkhanuja/siteshield";
 
 const report = await scan({ url: "https://yoursite.com", src: "." });
 
@@ -115,6 +118,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npx siteshield scan --src . --fail-on high`,
+      - run: npx @kabirkhanuja/siteshield scan --src . --fail-on high`,
   },
 ];

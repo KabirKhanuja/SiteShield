@@ -57,10 +57,58 @@ export class TargetError extends Error {
   }
 }
 
+/**
+ * Expands an IPv6 address (including a `::` run and any embedded dotted IPv4 tail) to its 16
+ * bytes, or null if it does not parse. Kept small; only used to inspect embedded IPv4.
+ */
+function ipv6Bytes(address: string): number[] | null {
+  let addr = address.toLowerCase();
+  const dotted = addr.match(/(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (dotted) {
+    const p = dotted.slice(1, 5).map(Number);
+    if (p.some((n) => n > 255)) return null;
+    const hex = `${((p[0]! << 8) | p[1]!).toString(16)}:${((p[2]! << 8) | p[3]!).toString(16)}`;
+    addr = addr.slice(0, dotted.index) + hex;
+  }
+  const halves = addr.split("::");
+  if (halves.length > 2) return null;
+  const head = halves[0] ? halves[0].split(":") : [];
+  const tail = halves.length === 2 ? (halves[1] ? halves[1].split(":") : []) : null;
+  const hextets =
+    tail === null ? head : [...head, ...Array(8 - head.length - tail.length).fill("0"), ...tail];
+  if (hextets.length !== 8) return null;
+  const bytes: number[] = [];
+  for (const h of hextets) {
+    const v = parseInt(h || "0", 16);
+    if (Number.isNaN(v) || v < 0 || v > 0xffff) return null;
+    bytes.push((v >> 8) & 0xff, v & 0xff);
+  }
+  return bytes;
+}
+
+/**
+ * NAT64 (64:ff9b::/96) and IPv4 mapped (::ffff:0:0/96) addresses carry a real IPv4 in their low
+ * 32 bits. Returns that dotted IPv4, or null if the address is not one of those forms.
+ */
+function embeddedIpv4(address: string): string | null {
+  const b = ipv6Bytes(address);
+  if (!b) return null;
+  const isV4Mapped = b.slice(0, 10).every((x) => x === 0) && b[10] === 0xff && b[11] === 0xff;
+  const isNat64 =
+    b[0] === 0x00 && b[1] === 0x64 && b[2] === 0xff && b[3] === 0x9b && b.slice(4, 12).every((x) => x === 0);
+  return isV4Mapped || isNat64 ? `${b[12]}.${b[13]}.${b[14]}.${b[15]}` : null;
+}
+
 export function isPublicAddress(address: string): boolean {
   const family = isIP(address);
   if (family === 0) return false;
-  return family === 4 ? !blockedV4.check(address, "ipv4") : !blockedV6.check(address, "ipv6");
+  if (family === 4) return !blockedV4.check(address, "ipv4");
+  // On a DNS64 network every public site with only an A record is reached through a NAT64
+  // IPv6 address, so judge the embedded IPv4 rather than blocking the whole prefix. A NAT64 or
+  // mapped address that wraps a private or reserved IPv4 is still blocked, so SSRF cover holds.
+  const v4 = embeddedIpv4(address);
+  if (v4) return !blockedV4.check(v4, "ipv4");
+  return !blockedV6.check(address, "ipv6");
 }
 
 /** Throws unless the URL is http(s), on a normal port, and not obviously internal. */

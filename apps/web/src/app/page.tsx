@@ -1,19 +1,17 @@
 import Link from "next/link";
-import { ArrowRightIcon, LockKeyholeIcon } from "lucide-react";
-import { ScanForm } from "@/components/scan/scan-form";
+import { ArrowRightIcon, FileCode2Icon, GlobeIcon, TerminalIcon } from "lucide-react";
+import { AnimatedTerminal } from "@/components/site/animated-terminal";
+import { ChecksShowcase } from "@/components/site/checks-showcase";
+import { CiPipeline } from "@/components/site/ci-pipeline";
 import { CodeBlock } from "@/components/site/code-block";
-import { Command } from "@/components/site/command";
-import { GradeTile, type Grade } from "@/components/site/grade";
-import { ReportPreview } from "@/components/site/report-preview";
+import { Reveal } from "@/components/site/reveal";
+import { ScoreExplainer } from "@/components/site/score-explainer";
 import { SeverityLabel, StatusLabel } from "@/components/site/severity";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { liveChecks, sourceChecks, type Check } from "@/lib/checks";
-import { headerFixes, usage } from "@/lib/examples";
-
-const SCAN_COMMAND = "npx siteshield scan https://yoursite.com --src .";
+import { headerFixes } from "@/lib/examples";
 
 export default function Home() {
   return (
@@ -21,12 +19,12 @@ export default function Home() {
       <SiteHeader />
       <main className="flex-1">
         <Hero />
-        <Checks />
         <Confirmation />
+        <Checks />
         <Fixes />
-        <Ownership />
+        <Ci />
         <Grades />
-        <Usage />
+        <RunItYourWay />
       </main>
       <SiteFooter />
     </>
@@ -39,95 +37,51 @@ function Container({ children, className = "" }: { children: React.ReactNode; cl
 
 function SectionHeading({ title, children }: { title: string; children?: React.ReactNode }) {
   return (
-    <div className="max-w-2xl space-y-3">
-      <h2 className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-[34px]">
-        {title}
-      </h2>
+    <Reveal className="max-w-2xl space-y-3">
+      <h2 className="font-heading text-3xl font-semibold tracking-tight text-balance sm:text-[34px]">{title}</h2>
       {children ? <div className="text-pretty text-muted-foreground">{children}</div> : null}
-    </div>
+    </Reveal>
   );
 }
 
 function Hero() {
   return (
     <section className="border-b">
-      <Container className="grid grid-cols-1 gap-12 py-14 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:py-20">
+      <Container className="grid grid-cols-1 gap-12 py-14 lg:grid-cols-[1fr_1.05fr] lg:items-center lg:py-20">
         <div className="space-y-7">
+          <span className="inline-flex items-center gap-2 rounded-full border bg-surface-low px-3 py-1 text-xs font-medium text-muted-foreground">
+            <span className="size-1.5 rounded-full bg-pass" /> Published on npm · @kabirkhanuja/siteshield
+          </span>
           <h1 className="font-heading text-4xl leading-[1.08] font-semibold tracking-tight text-balance sm:text-5xl lg:text-[56px]">
             Audit the site you shipped and the code behind it, in one pass.
           </h1>
           <p className="max-w-xl text-lg text-pretty text-muted-foreground">
-            SiteShield checks your live website and your source code together. When both point at the
-            same problem, the finding is marked confirmed. Every finding comes with the fix for your
-            stack, and a second scan tells you whether the fix actually worked.
+            SiteShield scans your live website and your source code together, then gives one A to F grade
+            with the fix for every problem. When both layers point at the same thing, it is marked
+            confirmed.
           </p>
-          <ScanForm className="max-w-xl" />
-          <div className="max-w-xl space-y-2">
-            <p className="text-sm text-muted-foreground">Or from a terminal, once the npm package is published:</p>
-            <Command value={SCAN_COMMAND} />
-          </div>
           <div className="flex flex-wrap gap-2">
+            <Button asChild size="lg" className="px-4">
+              <Link href="/scan">
+                <GlobeIcon data-icon="inline-start" />
+                Scan a site
+              </Link>
+            </Button>
             <Button asChild size="lg" variant="outline" className="px-4">
-              <Link href="/docs">
-                Read the docs
-                <ArrowRightIcon data-icon="inline-end" />
+              <Link href="/scan/code">
+                <FileCode2Icon data-icon="inline-start" />
+                Scan your code
               </Link>
             </Button>
             <Button asChild size="lg" variant="ghost" className="px-4">
-              <Link href="#checks">See what it checks</Link>
+              <Link href="/install">
+                <TerminalIcon data-icon="inline-start" />
+                Run it locally
+              </Link>
             </Button>
           </div>
         </div>
-        <ReportPreview />
-      </Container>
-    </section>
-  );
-}
-
-function CheckList({ title, items }: { title: string; items: Check[] }) {
-  return (
-    <div>
-      <h3 className="border-b pb-3 font-heading text-lg font-semibold">{title}</h3>
-      <ul className="divide-y">
-        {items.map((c) => (
-          <li key={c.id} className="grid grid-cols-[4.25rem_1fr] gap-x-3 py-4">
-            <span className="pt-0.5 font-mono text-xs text-muted-foreground">{c.id}</span>
-            <div className="space-y-1">
-              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium">
-                {c.name}
-                {c.mode === "verified" ? (
-                  <span className="inline-flex items-center gap-1 text-xs font-normal text-primary-text">
-                    <LockKeyholeIcon className="size-3" aria-hidden />
-                    after ownership check
-                  </span>
-                ) : null}
-              </p>
-              <p className="text-sm text-pretty text-muted-foreground">{c.question}</p>
-              {c.pairsWith ? (
-                <p className="font-mono text-[11px] text-muted-foreground">
-                  confirms with {c.pairsWith.join(", ")}
-                </p>
-              ) : null}
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function Checks() {
-  return (
-    <section id="checks" className="py-16 lg:py-24">
-      <Container className="space-y-12">
-        <SectionHeading title="Nineteen checks across two layers">
-          Checks that only read public information run on any site. The ones that send test traffic
-          wait until you prove the site is yours.
-        </SectionHeading>
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-          <CheckList title="On the live site" items={liveChecks} />
-          <CheckList title="In your source code" items={sourceChecks} />
-        </div>
+        <AnimatedTerminal className="ss-float lg:justify-self-end" />
       </Container>
     </section>
   );
@@ -135,16 +89,15 @@ function Checks() {
 
 function Confirmation() {
   return (
-    <section className="border-y bg-surface-low py-16 lg:py-24">
+    <section className="border-b bg-surface-low py-16 lg:py-24">
       <Container className="space-y-10">
         <SectionHeading title="When the code and the site agree, it is not a guess">
-          Scanners that read only code flag things that never reach production. Scanners that probe
-          only the site cannot tell you which line to change. SiteShield runs both and matches the
-          results, so you know what is real and where it lives.
+          Scanners that read only code flag things that never reach production. Scanners that probe only
+          the site cannot tell you which line to change. SiteShield runs both and matches the results.
         </SectionHeading>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div className="overflow-hidden rounded-lg border bg-background">
+          <Reveal className="overflow-hidden rounded-lg border bg-background">
             <div className="flex h-10 items-center justify-between border-b px-4 text-xs">
               <span className="font-medium">What the code says</span>
               <span className="font-mono text-muted-foreground">src/server.ts:12</span>
@@ -158,8 +111,8 @@ function Confirmation() {
                 {"\n    credentials: true,\n  })\n);"}
               </code>
             </pre>
-          </div>
-          <div className="overflow-hidden rounded-lg border bg-background">
+          </Reveal>
+          <Reveal delay={140} className="overflow-hidden rounded-lg border bg-background">
             <div className="flex h-10 items-center justify-between border-b px-4 text-xs">
               <span className="font-medium">What the site does</span>
               <span className="font-mono text-muted-foreground">GET /api/me</span>
@@ -173,21 +126,34 @@ function Confirmation() {
                 {"\n< access-control-allow-credentials: true"}
               </code>
             </pre>
-          </div>
+          </Reveal>
         </div>
 
-        {/* The verdict, marked the same way as a row in the report rather than as a callout box. */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-6">
+        <Reveal className="flex flex-col gap-2 sm:flex-row sm:gap-6">
           <div className="flex shrink-0 items-start gap-4">
             <StatusLabel status="confirmed" />
             <SeverityLabel severity="high" className="pt-0.5" />
           </div>
           <p className="text-sm text-pretty text-muted-foreground">
             The config reflects any origin and the live API proves it. A page on any other domain can
-            read <span className="font-mono text-foreground">/api/me</span> as your logged in user.
-            The fix goes on line 12.
+            read <span className="font-mono text-foreground">/api/me</span> as your logged in user. The
+            fix goes on line 12.
           </p>
-        </div>
+        </Reveal>
+      </Container>
+    </section>
+  );
+}
+
+function Checks() {
+  return (
+    <section id="checks" className="py-16 lg:py-24">
+      <Container className="space-y-12">
+        <SectionHeading title="Twenty checks across two layers">
+          Checks that only read public information run on any site. The ones that send test traffic wait
+          until you prove the site is yours.
+        </SectionHeading>
+        <ChecksShowcase />
       </Container>
     </section>
   );
@@ -195,148 +161,95 @@ function Confirmation() {
 
 function Fixes() {
   return (
-    <section id="fixes" className="py-16 lg:py-24">
+    <section id="fixes" className="border-y bg-surface-low py-16 lg:py-24">
       <Container className="grid grid-cols-1 gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-        <div className="space-y-6">
-          <SectionHeading title="A fix you can paste, not a link to a blog post">
-            SiteShield reads your project to work out what you deploy with, then writes each fix in
-            that stack&apos;s own terms. This one adds the headers an HDR001 finding asks for.
-          </SectionHeading>
-          <p className="text-sm text-muted-foreground">
-            After you apply it, run the scan again. The report shows what changed since the last run:
-            fixed, still open, or new.
-          </p>
-        </div>
-        <Tabs defaultValue={headerFixes[0].label} className="min-w-0">
-          <TabsList>
-            {headerFixes.map((s) => (
-              <TabsTrigger key={s.label} value={s.label} className="px-3">
-                {s.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          {headerFixes.map((s) => (
-            <TabsContent key={s.label} value={s.label}>
-              <CodeBlock code={s.code} file={s.file} />
-            </TabsContent>
-          ))}
-        </Tabs>
-      </Container>
-    </section>
-  );
-}
-
-function Ownership() {
-  const steps = [
-    {
-      title: "Ask for a token",
-      body: "Run siteshield verify with your domain. You get a random token that belongs to this site and this machine.",
-    },
-    {
-      title: "Publish it",
-      body: "Add it as a DNS TXT record, or serve it from /.well-known/siteshield.txt. Either one proves you control the site.",
-    },
-    {
-      title: "Scan with active checks",
-      body: "Rate limiting, exposed file and injection checks unlock. Every request they send is written to an audit log you keep.",
-    },
-  ];
-
-  return (
-    <section className="border-y bg-surface-low py-16 lg:py-24">
-      <Container className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
-        <SectionHeading title="It will not probe a site you do not own">
-          Sending login attempts or test payloads to someone else&apos;s server without permission is
-          an offence in most countries, including under the IT Act in India. So SiteShield asks for
-          proof first, the same way search consoles and certificate authorities do.
+        <SectionHeading title="A fix you can paste, not a link to a blog post">
+          SiteShield reads your project to work out what you deploy with, then writes each fix in that
+          stack&apos;s own terms. This one adds the headers an HDR001 finding asks for. Run the scan
+          again and the report shows what changed: fixed, still open, or new.
         </SectionHeading>
-        <div className="space-y-6">
-          <ol className="space-y-5">
-            {steps.map((s, i) => (
-              <li key={s.title} className="grid grid-cols-[2rem_1fr] gap-3">
-                <span className="flex size-8 items-center justify-center rounded-sm bg-primary-container font-heading text-sm font-semibold text-on-primary-container">
-                  {i + 1}
-                </span>
-                <div className="space-y-1 pt-1">
-                  <p className="font-medium">{s.title}</p>
-                  <p className="text-sm text-pretty text-muted-foreground">{s.body}</p>
-                </div>
-              </li>
+        <Reveal delay={120} className="min-w-0">
+          <Tabs defaultValue={headerFixes[0].label} className="min-w-0">
+            <TabsList>
+              {headerFixes.map((s) => (
+                <TabsTrigger key={s.label} value={s.label} className="px-3">
+                  {s.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {headerFixes.map((s) => (
+              <TabsContent key={s.label} value={s.label}>
+                <CodeBlock code={s.code} file={s.file} className="bg-background" />
+              </TabsContent>
             ))}
-          </ol>
-          <CodeBlock
-            file="DNS record"
-            code={`_siteshield.yoursite.com.  TXT  "siteshield-verify=7f3c9a1e52b84d06"`}
-          />
-        </div>
+          </Tabs>
+        </Reveal>
       </Container>
     </section>
   );
 }
 
-const gradeScale: { grade: Grade; range: string; meaning: string }[] = [
-  { grade: "A", range: "90 to 100", meaning: "Nothing above low severity. Keep scanning in CI." },
-  { grade: "B", range: "75 to 89", meaning: "Solid, with a few gaps worth closing this sprint." },
-  { grade: "C", range: "60 to 74", meaning: "Real exposure. Start with anything confirmed." },
-  { grade: "D", range: "40 to 59", meaning: "Serious issues, or any confirmed critical finding." },
-  { grade: "F", range: "below 40", meaning: "Stop and fix before the next deploy." },
-];
+function Ci() {
+  return (
+    <section className="py-16 lg:py-24">
+      <Container className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
+        <SectionHeading title="Block the bad deploy before it merges">
+          Drop SiteShield into a GitHub Action and it scans every pull request. Findings show up in the
+          Security tab, and the gate fails the build on anything high or critical, so the problem never
+          reaches your main branch.
+        </SectionHeading>
+        <Reveal delay={120}>
+          <CiPipeline />
+        </Reveal>
+      </Container>
+    </section>
+  );
+}
 
 function Grades() {
   return (
-    <section className="py-16 lg:py-24">
+    <section className="border-y bg-surface-low py-16 lg:py-24">
       <Container className="space-y-10">
-        <SectionHeading title="One grade for the whole app">
-          Every scan starts at 100. Each finding takes points off by severity, and confirmed findings
-          count one and a half times. A confirmed critical finding caps the grade at D, however clean
-          the rest is.
+        <SectionHeading title="How the grade is actually calculated">
+          One number for the whole app, worked out the same way every time. No black box.
         </SectionHeading>
-        <ol className="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-5">
-          {gradeScale.map((g) => (
-            <li key={g.grade} className="flex gap-4 bg-background p-4 sm:flex-col">
-              <GradeTile grade={g.grade} className="size-12 shrink-0 text-2xl" />
-              <div className="space-y-1">
-                <p className="font-mono text-xs text-muted-foreground">{g.range}</p>
-                <p className="text-sm text-pretty">{g.meaning}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
+        <ScoreExplainer />
       </Container>
     </section>
   );
 }
 
-function Usage() {
+const cards = [
+  { href: "/scan", icon: GlobeIcon, title: "Scan a site", body: "Paste any public URL and grade its live security from the browser." },
+  { href: "/scan/code", icon: FileCode2Icon, title: "Scan your code", body: "Upload a project folder and read the source for the problems behind it." },
+  { href: "/install", icon: TerminalIcon, title: "Run it locally", body: "Install from npm and run siteshield in your terminal or in CI." },
+];
+
+function RunItYourWay() {
   return (
-    <section className="border-t bg-surface-low py-16 lg:py-24">
-      <Container className="grid grid-cols-1 gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-        <div className="space-y-6">
-          <SectionHeading title="Run it wherever you already work">
-            From a terminal with npx, from a config file checked into the repo, as a library inside
-            your own tooling, or on every pull request.
-          </SectionHeading>
-          <Button asChild variant="outline" className="px-4">
-            <Link href="/docs">
-              Full documentation
-              <ArrowRightIcon data-icon="inline-end" />
-            </Link>
-          </Button>
-        </div>
-        <Tabs defaultValue={usage[0].label} className="min-w-0">
-          <TabsList className="max-w-full overflow-x-auto">
-            {usage.map((s) => (
-              <TabsTrigger key={s.label} value={s.label} className="px-3">
-                {s.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          {usage.map((s) => (
-            <TabsContent key={s.label} value={s.label}>
-              <CodeBlock code={s.code} file={s.file} className="bg-background" />
-            </TabsContent>
+    <section className="py-16 lg:py-24">
+      <Container className="space-y-10">
+        <SectionHeading title="Run it your way">Three ways in, one engine behind all of them.</SectionHeading>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {cards.map((c, i) => (
+            <Reveal key={c.href} delay={i * 110}>
+              <Link
+                href={c.href}
+                className="group flex h-full flex-col gap-3 rounded-xl border bg-surface-low p-5 transition hover:-translate-y-0.5 hover:shadow-sm"
+              >
+                <span className="flex size-10 items-center justify-center rounded-lg bg-surface-mid text-primary-text">
+                  <c.icon className="size-5" />
+                </span>
+                <span className="font-heading text-lg font-semibold">{c.title}</span>
+                <span className="text-sm text-pretty text-muted-foreground">{c.body}</span>
+                <span className="mt-auto inline-flex items-center gap-1 text-sm font-medium text-primary-text">
+                  Open
+                  <ArrowRightIcon className="size-4 transition group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+            </Reveal>
           ))}
-        </Tabs>
+        </div>
       </Container>
     </section>
   );

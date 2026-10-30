@@ -37,7 +37,8 @@ export async function scan(options: ScanOptions, onEvent: (e: ScanEvent) => void
   const wanted = (id: string) =>
     (!options.only || options.only.includes(id)) && !(options.ignore ?? []).includes(id);
 
-  if (!options.url && !options.src) {
+  const hasSource = Boolean(options.src || options.srcFiles);
+  if (!options.url && !hasSource) {
     throw new Error("Nothing to scan: pass a url, a src folder, or both.");
   }
 
@@ -84,9 +85,10 @@ export async function scan(options: ScanOptions, onEvent: (e: ScanEvent) => void
   }
 
   // ---- Source scan ----
-  if (options.src) {
+  if (hasSource) {
     const result = await scanSource({
       root: options.src,
+      files: options.srcFiles,
       stack: options.stack,
       offline: options.offline,
       only: options.only,
@@ -112,15 +114,17 @@ export async function scan(options: ScanOptions, onEvent: (e: ScanEvent) => void
 
   const findings: Finding[] = checks.flatMap((c) => c.findings);
   // Mark the findings that both layers agree on. Only meaningful when both ran.
-  if (options.url && options.src) correlate(findings);
+  if (options.url && hasSource) correlate(findings);
 
   const { score, grade } = scoreFindings(findings);
 
+  const srcLabel = options.src ?? (options.srcFiles ? "uploaded source" : undefined);
+
   return {
-    target: origin ?? options.src ?? "source",
+    target: origin ?? srcLabel ?? "source",
     icon,
     url: origin,
-    src: options.src,
+    src: srcLabel,
     stacks,
     startedAt,
     finishedAt: new Date().toISOString(),

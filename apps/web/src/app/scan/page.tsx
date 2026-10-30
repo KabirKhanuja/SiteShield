@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LockKeyholeIcon } from "lucide-react";
 import { ScanForm } from "@/components/scan/scan-form";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -28,6 +29,10 @@ export default function ScanPage() {
           <p className="max-w-xl text-sm text-muted-foreground">
             Local and private addresses are refused. Anyone with a report&apos;s link can open it, so
             share links with care.
+          </p>
+          <p className="max-w-xl text-sm text-muted-foreground">
+            Want to check the code behind a site?{" "}
+            <Link href="/scan/code" className="underline underline-offset-4">Scan your source</Link>.
           </p>
         </div>
 

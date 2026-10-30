@@ -41,25 +41,36 @@ export default function DocsPage() {
             <h1 className="font-heading text-4xl font-semibold tracking-tight">Documentation</h1>
             <p className="text-lg text-pretty text-muted-foreground">
               Everything you need to scan a site and its code, understand the report, and fix what it
-              finds. SiteShield is still being built and is not on npm yet, so this page describes how
-              version 0.1 will work when it ships.
+              finds. SiteShield is published on npm as{" "}
+              <a
+                href="https://www.npmjs.com/package/@kabirkhanuja/siteshield"
+                className="text-primary-text underline underline-offset-4"
+              >
+                @kabirkhanuja/siteshield
+              </a>
+              .
             </p>
             <DocsMobileNav links={sections} />
           </header>
 
           <Section id="install" title="Install">
             <p>
-              You do not have to install anything to try it. npx downloads the latest version, runs it
-              and cleans up:
+              Install it once and the command is just <Code>siteshield</Code>:
             </p>
-            <Command value="npx siteshield scan https://yoursite.com" />
+            <Command value="npm install -g @kabirkhanuja/siteshield" />
             <p>
-              If you want the same version for everyone on the team and in CI, add it as a dev
-              dependency instead:
+              You do not have to install anything to try it, though. npx downloads the latest version,
+              runs it and cleans up:
             </p>
-            <Command value="npm install --save-dev siteshield" />
+            <Command value="npx @kabirkhanuja/siteshield scan https://yoursite.com" />
+            <p>
+              For the same version across the team and in CI, add it as a dev dependency instead:
+            </p>
+            <Command value="npm install --save-dev @kabirkhanuja/siteshield" />
             <p className="text-sm text-muted-foreground">
-              Requires Node 20 or newer. Works on macOS, Linux and Windows.
+              The package name carries the <Code>@kabirkhanuja/</Code> prefix, but the command you run
+              is always <Code>siteshield</Code>. Requires Node 20 or newer. Works on macOS, Linux and
+              Windows.
             </p>
           </Section>
 
@@ -68,7 +79,7 @@ export default function DocsPage() {
               Run it from the root of your project and pass the address where that project is deployed.
               The <Code>--src</Code> flag points at the code to read.
             </p>
-            <Command value="npx siteshield scan https://yoursite.com --src ." />
+            <Command value="siteshield scan https://yoursite.com --src ." />
             <p>
               The first run only does passive checks on the live site, meaning it reads what any visitor
               could read: certificates, headers, DNS records and public JavaScript. That takes about
@@ -82,10 +93,10 @@ export default function DocsPage() {
             <CodeBlock
               file="terminal"
               code={`# only the live site
-npx siteshield scan https://yoursite.com
+siteshield scan https://yoursite.com
 
 # only the code, no network requests at all
-npx siteshield scan --src .`}
+siteshield scan --src .`}
             />
           </Section>
 
@@ -178,7 +189,7 @@ npx siteshield scan --src .`}
             </p>
             <CodeBlock
               file="terminal"
-              code={`$ npx siteshield verify yoursite.com
+              code={`$ siteshield verify yoursite.com
 
 Add one of these, then run the same command again:
 
@@ -243,11 +254,11 @@ Add one of these, then run the same command again:
             </p>
             <CodeBlock
               file="terminal"
-              code={`npx siteshield scan https://yoursite.com --src . --format json > before.json
+              code={`siteshield scan https://yoursite.com --src . --format json > before.json
 
 # apply the fixes, deploy
 
-npx siteshield scan https://yoursite.com --src . --baseline before.json`}
+siteshield scan https://yoursite.com --src . --baseline before.json`}
             />
           </Section>
 

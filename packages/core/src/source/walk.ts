@@ -116,6 +116,39 @@ export function walkSource(root: string): SourceFile[] {
   return files;
 }
 
+/**
+ * Decides, from a forward-slashed relative path, whether a file is worth scanning. Shares the
+ * skip rules with the disk walk so an uploaded tree is filtered the same way as one on disk.
+ */
+export function pathIsScannable(path: string): boolean {
+  const parts = path.split("/").filter(Boolean);
+  const name = parts[parts.length - 1];
+  if (!name) return false;
+  for (const seg of parts.slice(0, -1)) {
+    if (SKIP_DIRS.has(seg)) return false;
+    if (seg.startsWith(".") && seg !== ".github") return false;
+  }
+  return shouldRead(name);
+}
+
+/**
+ * Builds SourceFiles from files uploaded in memory (for example from a browser folder picker),
+ * applying the same filters, size cap and binary guard as {@link walkSource}.
+ */
+export function sourceFilesFromUploads(inputs: { path: string; content: string }[]): SourceFile[] {
+  const files: SourceFile[] = [];
+  for (const input of inputs) {
+    if (files.length >= MAX_FILES) break;
+    const path = input.path.split(sep).join("/").replace(/^\.?\/+/, "");
+    if (!pathIsScannable(path)) continue;
+    const content = input.content;
+    if (content.length > MAX_FILE_BYTES) continue;
+    if (content.includes("\u0000")) continue; // really binary despite the extension
+    files.push({ path, content, lines: content.split(/\r?\n/) });
+  }
+  return files;
+}
+
 /** Turns a character offset in a file's content into a 1-based line and column. */
 export function positionAt(content: string, index: number): { line: number; column: number } {
   let line = 1;

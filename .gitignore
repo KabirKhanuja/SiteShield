@@ -6,3 +6,19 @@ node_modules/
 unslop.md
 script.md
 eh syllabus copy 2.pdf
+
+# Intentional fixture for the SiteShield demo (fake values, scanned on purpose)
+!demo/vulnerable-shop/.env
+
+# CLI publish build output
+packages/cli/dist/
+*.tgz
+
+.pdf
+SiteShield_Course_Project_Report.docx
+SiteShield_Course_Project_Report.pdf
+SiteShield_Presentation.pdf
+SiteShield_Presentation.pptx
+demo
+packages/
+SiteShield/packages

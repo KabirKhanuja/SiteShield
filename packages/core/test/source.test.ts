@@ -8,6 +8,8 @@ import { publicEnvCheck } from "../src/source/checks/public-env.ts";
 import { rateLimitCheck } from "../src/source/checks/rate-limit.ts";
 import { secretsCheck } from "../src/source/checks/secrets.ts";
 import { xssCheck } from "../src/source/checks/xss.ts";
+import { scan } from "../src/scan.ts";
+import { sourceFilesFromUploads } from "../src/source/walk.ts";
 import { detectStacks } from "../src/source/stack.ts";
 import type { SourceContext, SourceFile } from "../src/source/types.ts";
 
@@ -99,6 +101,22 @@ test("RTL002 flags a login route with no limiter", async () => {
     file("s.js", `import { rateLimit } from "express-rate-limit";\napp.post("/login", limiter, h);`),
   ]);
   assert.equal(good.length, 0);
+});
+
+test("sourceFilesFromUploads filters junk and scan() grades in-memory files", async () => {
+  const uploads = [
+    { path: "node_modules/pkg/evil.js", content: `app.use(cors({ origin: "*", credentials: true }));` }, // dependency, skipped
+    { path: "app/server.js", content: `app.use(cors({ origin: "*", credentials: true }));` },
+    { path: "logo.png", content: "not real binary" }, // not a scannable type, skipped
+  ];
+  const files = sourceFilesFromUploads(uploads);
+  assert.deepEqual(
+    files.map((f) => f.path),
+    ["app/server.js"],
+  );
+  const report = await scan({ srcFiles: files, offline: true });
+  assert.equal(report.src, "uploaded source");
+  assert.ok(report.findings.some((f) => f.checkId === "COR002"));
 });
 
 test("detectStacks recognises Next.js and Express from package.json", () => {

@@ -8,6 +8,14 @@ test("public addresses pass", () => {
   }
 });
 
+test("NAT64 and IPv4 mapped addresses wrapping a public IPv4 pass (DNS64 networks)", () => {
+  // 64:ff9b::d8c6:4f41 is the NAT64 form of 216.198.79.65, a public address. On a DNS64
+  // network a public site with only an A record is reached this way, so it must not be blocked.
+  for (const ip of ["64:ff9b::d8c6:4f41", "64:ff9b::808:808", "::ffff:8.8.8.8"]) {
+    assert.equal(isPublicAddress(ip), true, ip);
+  }
+});
+
 test("private, loopback, metadata and mapped addresses are blocked", () => {
   for (const ip of [
     "127.0.0.1",

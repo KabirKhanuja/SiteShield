@@ -122,6 +122,23 @@ test("active scans need a verified ownership key", async () => {
   await queue.idle();
 });
 
+test("source scan accepts uploaded files and returns a graded report", async () => {
+  const res = await post("/api/source-scans", {
+    offline: true,
+    files: [{ path: "server.js", content: `app.use(cors({ origin: "*", credentials: true }));` }],
+  });
+  assert.equal(res.status, 200);
+  const body = (await res.json()) as any;
+  assert.equal(body.scanned, 1);
+  assert.ok(body.report.findings.some((f: any) => f.checkId === "COR002"));
+});
+
+test("source scan rejects an upload with nothing scannable", async () => {
+  const res = await post("/api/source-scans", { offline: true, files: [{ path: "logo.png", content: "x" }] });
+  assert.equal(res.status, 400);
+  assert.equal(((await res.json()) as any).error.code, "no_source");
+});
+
 test("oversized bodies are rejected", async () => {
   const res = await post("/api/scans", { url: "x".repeat(20_000) });
   assert.equal(res.status, 413);

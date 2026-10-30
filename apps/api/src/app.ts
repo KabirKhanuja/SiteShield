@@ -8,6 +8,7 @@ import { errorHandler, notFound } from "./errors.ts";
 import type { ScanQueue } from "./jobs.ts";
 import { OWNERSHIP_HEADER } from "./ownership.ts";
 import { scansRouter } from "./routes/scans.ts";
+import { sourceScansRouter } from "./routes/source-scans.ts";
 import { verificationsRouter } from "./routes/verifications.ts";
 
 export function createApp(config: Config, db: Db, queue: ScanQueue) {
@@ -27,6 +28,10 @@ export function createApp(config: Config, db: Db, queue: ScanQueue) {
       maxAge: 600,
     }),
   );
+  // Source scans carry a code payload, so they are mounted before the small global body
+  // limit and bring their own larger parser and rate limiter.
+  app.use("/api/source-scans", sourceScansRouter(config.SCANS_PER_10_MIN));
+
   app.use(express.json({ limit: "10kb" }));
   app.use(
     rateLimit({

@@ -10,7 +10,7 @@ import { secretsCheck } from "./checks/secrets.ts";
 import { xssCheck } from "./checks/xss.ts";
 import { detectStacks } from "./stack.ts";
 import { forStacks, type PackageJson, type SourceCheck, type SourceContext } from "./types.ts";
-import { walkSource } from "./walk.ts";
+import { walkSource, type SourceFile } from "./walk.ts";
 
 export const sourceChecks: SourceCheck[] = [
   secretsCheck,
@@ -33,7 +33,10 @@ export type SourceScanResult = {
 };
 
 export type SourceScanOptions = {
-  root: string;
+  /** Folder to read from disk. Omit when passing {@link files} directly. */
+  root?: string;
+  /** Pre-read files (for example uploaded from a browser). Used instead of walking {@link root}. */
+  files?: SourceFile[];
   stack?: Stack[];
   offline?: boolean;
   only?: string[];
@@ -57,12 +60,12 @@ function parsePackages(files: SourceContext["files"]): PackageJson[] {
 
 /** Reads a source tree once and runs every source check against it. */
 export async function scanSource(options: SourceScanOptions): Promise<SourceScanResult> {
-  const files = walkSource(options.root);
+  const files = options.files ?? walkSource(options.root ?? ".");
   const packages = parsePackages(files);
   const stacks = options.stack?.length ? options.stack : detectStacks(files, packages);
 
   const ctx: SourceContext = {
-    root: options.root,
+    root: options.root ?? "",
     files,
     packages,
     stacks,

@@ -22,6 +22,7 @@ export function SiteFooter() {
         <nav className="flex gap-6 text-muted-foreground sm:flex-col sm:gap-2">
           <Link className="hover:text-foreground" href="/docs">Documentation</Link>
           <Link className="hover:text-foreground" href="/docs#checks">Check reference</Link>
+          <a className="hover:text-foreground" href="https://www.npmjs.com/package/@kabirkhanuja/siteshield">npm package</a>
           <a className="hover:text-foreground" href="https://github.com/KabirKhanuja/SiteShield">GitHub</a>
         </nav>
       </div>
